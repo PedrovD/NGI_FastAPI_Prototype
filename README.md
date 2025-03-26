@@ -1,84 +1,113 @@
-# Introductie
-Deze repository bevat de code voor de CMD Opdrachtenbox, ontwikkeld voor het lectoraat van de HAN. De applicatie functioneert als een platform waarop externe bedrijven opdrachten kunnen plaatsen, waarna studenten zich hiervoor kunnen aanmelden.
+# NGI FastAPI Backend
 
-# Installatie
-In dit hoofdstuk wordt beschreven hoe de applicatie te installeren is voor zowel productie als development.
-## Productie
-1. Download Docker
-2. Clone de repository en ga naar de root van de repository
-3. Pas in de bestanden [`application.properties`](backend/src/main/resources/application.properties) en [`application-docker.properties`](backend/src/main/resources/application-docker.properties) de volgende categoriën aan:
-    - `db`
-        ```properties
-        spring.datasource.url=jdbc:postgresql://[URL VAN DATABASE]/postgres
-        spring.datasource.password=[WACHTWOORD VAN DATABASE, TE VINDEN IN DOCKER COMPOSE]
-        ```
-    - `oauth`
-        ```properties
-        # google -> https://console.cloud.google.com/apis/dashboard
-        spring.security.oauth2.client.registration.google.client-id=[CLIENT ID]
-        spring.security.oauth2.client.registration.google.client-secret=[CLIENT SECRET]
+A modern, efficient backend for the NGI application built with FastAPI, SQLAlchemy, and Pydantic.
 
-        # github -> https://github.com/settings/applications/new
-        spring.security.oauth2.client.registration.github.client-id=[CLIENT ID]
-        spring.security.oauth2.client.registration.github.client-secret=[CLIENT SECRET]
-        ```
-    - `frontend`
-        ```properties
-        frontend.url=http://[FRONTEND URL]
-        ```
-    - `backend`
-        ```properties
-        backend.url=http://[BACKEND URL]
-        ```
-4. Open een terminal in de root van de repository en voer de volgende commando uit:
+## Features
 
-    ```bash
-    docker compose up
-    ```
+- **Modern Architecture**: Built with FastAPI, SQLAlchemy, and Pydantic
+- **Clean Code**: Follows software design principles like SOLID, DRY, and KISS
+- **Extensible**: Designed for easy extension and modification
+- **OAuth2 Authentication**: Supports Google and GitHub authentication
+- **Role-Based Access Control**: Different roles for students, teachers, and supervisors
+- **Docker Support**: Easy deployment with Docker and Docker Compose
+- **API Documentation**: Automatic API documentation with Swagger UI
 
-## Development
-1. Clone de repository
-2. Installeer Docker Desktop en start deze op
-3. Open een terminal in de root van de repository en voer de volgende commando uit:
+## Architecture
 
-    ```bash
-    docker compose up
-    ```
-4. Via Docker Desktop, zet frontend en backend uit
-### Backend opstarten
-5. Dubbelklik op [`backend/pom.xml`](backend/pom.xml), dit opent de backend als een project in IntelliJ. ⚠️ Let op: Als je dit niet doet, kan het zijn dat de backend de resources map niet ziet en werken sommige functies dus niet.
-6. Start via IntelliJ de backend op
-### Frontend opstarten
-7. Open een terminal in de root van de repository en voer de volgende commando's uit:
+The backend follows a clean architecture with the following layers:
 
-    ```bash
-    cd frontend
-    npm install
-    npm run dev
-    ```
+- **API Layer**: FastAPI routes and endpoints
+- **Service Layer**: Business logic and use cases
+- **Repository Layer**: Data access and persistence
+- **Model Layer**: Database models and schemas
 
-### Aanpassingen aan database
-8. Wanneer je een aanpassing maakt aan de database ([schema.sql](backend/src/main/resources/database/schema.sql)), voer dan de volgende commando's uit:
+## Design Principles
 
-    ```bash
-    docker compose down -v
-    docker compose up --build
-    ```
+The backend is designed with the following principles in mind:
 
-# Testen
-In dit hoofdstuk wordt beschreven hoe de applicatie getest kan worden.
-## Frontend
-- We gebruiken Storybook voor het testen van de componenten. Start Storybook op door de volgende commando op de frontend folder uit te voeren:
+- **Open/Closed Principle**: Open for extension, closed for modification
+- **Single Responsibility Principle**: Each class has a single responsibility
+- **Dependency Inversion**: High-level modules depend on abstractions
+- **Composition over Inheritance**: Prefer composition over inheritance
+- **Law of Demeter**: Minimize dependencies between components
+- **Information Hiding**: Hide implementation details
+- **Program to an Interface**: Depend on interfaces, not implementations
+- **Encapsulate What Varies**: Isolate what varies from what stays the same
+- **Cohesion**: Keep related things together
+- **Separation of Concerns**: Separate different concerns into different modules
 
-    ```bash
-    npm run storybook
-    ```
-- Accessibility is te testen via de 'Accessibility' tab in Storybook
-- De interactions en accessibility worden ook door de CI pipeline getest
+## Getting Started
 
-## Backend
-- Voer de unit tests uit door bij de [`test/java`](backend/src/test/) folder rechtermuisknop te klikken en `Run 'Tests in 'java''` te selecteren
-- Je kan de mutation tests uitvoeren door via GitHub Actions de Mutation Tests handmatig op jouw branch uit te voeren.
-- Test het versturen van de automatische emails in de [MailCronJob](backend/src/main/java/com/han/pwac/pinguins/backend/cron_jobs/MailCronJob.java) klasse door `@Scheduled` annotation te veranderen bij de `execute` methode naar `EVERY_SECOND`
+### Prerequisites
 
-Verdere uitleg van de functies van de applicatie staan uitgelegd in het Software Guidebook.
+- Python 3.11 or higher
+- Docker and Docker Compose (optional)
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+3. Run the application:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+### Docker
+
+1. Build and run with Docker Compose:
+
+```bash
+docker-compose up -d
+```
+
+## API Documentation
+
+The API documentation is available at:
+
+- Swagger UI: http://localhost:8000/api/v1/docs
+- ReDoc: http://localhost:8000/api/v1/redoc
+
+## Environment Variables
+
+The application can be configured using environment variables:
+
+- `SQLALCHEMY_DATABASE_URI`: Database connection string
+- `SECRET_KEY`: Secret key for JWT tokens
+- `FRONTEND_URL`: URL of the frontend application
+- `GITHUB_CLIENT_ID`: GitHub OAuth client ID
+- `GITHUB_CLIENT_SECRET`: GitHub OAuth client secret
+- `GOOGLE_CLIENT_ID`: Google OAuth client ID
+- `GOOGLE_CLIENT_SECRET`: Google OAuth client secret
+
+## Project Structure
+
+```
+app/
+├── api/                  # API endpoints
+│   └── api_v1/           # API version 1
+│       ├── endpoints/    # API endpoints
+│       └── api.py        # API router
+├── auth/                 # Authentication
+│   ├── dependencies.py   # Auth dependencies
+│   └── oauth2.py         # OAuth2 implementation
+├── core/                 # Core functionality
+│   └── config.py         # Application configuration
+├── db/                   # Database
+│   ├── init_db.py        # Database initialization
+│   └── session.py        # Database session
+├── models/               # Database models
+├── repositories/         # Data access layer
+├── schemas/              # Pydantic schemas
+├── services/             # Business logic
+└── main.py               # Application entry point
+```
+
+## License
+
+This project is licensed under the MIT License.
