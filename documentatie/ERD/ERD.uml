@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>DATABASE</ID>
+  <OriginalElement>b87c2c60-8e2e-4916-a9bd-d343ec6259f5.SCHEMA:postgres.public</OriginalElement>
+  <nodes>
+    <node x="-595.8694736842104" y="172.0">b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.skills</node>
+    <node x="-150.6568421052632" y="172.0">b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.teachers</node>
+    <node x="3.5" y="526.5947368421052">b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.tasks</node>
+    <node x="-470.9052631578946" y="455.87894736842134">b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.studentsskills</node>
+    <node x="-371.7631578947368" y="172.0">b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.students</node>
+    <node x="-128.38105263157894" y="-100.0">b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.users</node>
+    <node x="-330.7631578947368" y="777.3210526315793">b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.tasksskills</node>
+    <node x="-64.88437684210504" y="777.3210526315793">b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.tasksregistrations</node>
+    <node x="-371.7631578947369" y="-63.5">b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.cronjobruns</node>
+    <node x="230.18631578947372" y="159.5">b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.invitekeys</node>
+    <node x="11.0" y="159.5">b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.supervisors</node>
+    <node x="-7.0" y="295.0473684210526">b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.projects</node>
+    <node x="133.0" y="-100.0">b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.business</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.students" target="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.users" relationship="REFERENCES">
+      <point x="0.0" y="-56.0" />
+      <point x="-290.7631578947368" y="109.75" />
+      <point x="-81.88105263157894" y="109.75" />
+      <point x="-46.5" y="80.0" />
+    </edge>
+    <edge source="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.projects" target="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.supervisors" relationship="REFERENCES">
+      <point x="0.0" y="-92.0" />
+      <point x="86.0" y="275.0501052631579" />
+      <point x="87.1654736842114" y="275.0501052631579" />
+      <point x="1.1654736842114062" y="44.77242105263156" />
+    </edge>
+    <edge source="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.tasksskills" target="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.skills" relationship="REFERENCES">
+      <point x="-26.557517894735838" y="-34.412631578948776" />
+      <point x="-290.5013905263154" y="786.4084210526305" />
+      <point x="-290.5013905263154" y="704.0367831578939" />
+      <point x="-513.3694736842104" y="704.0367831578939" />
+      <point x="0.0" y="68.0" />
+    </edge>
+    <edge source="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.tasks" target="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.projects" relationship="REFERENCES">
+      <point x="0.0" y="-92.0" />
+      <point x="86.0" y="526.7605263157895" />
+      <point x="86.0" y="526.7605263157895" />
+      <point x="0.0" y="92.0" />
+    </edge>
+    <edge source="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.invitekeys" target="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.users" relationship="REFERENCES">
+      <point x="-36.49347368420962" y="-53.90547368421056" />
+      <point x="276.1928421052641" y="88.0" />
+      <point x="11.118947368421061" y="88.0" />
+      <point x="46.5" y="80.0" />
+    </edge>
+    <edge source="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.studentsskills" target="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.skills" relationship="REFERENCES">
+      <point x="-47.75" y="-56.0" />
+      <point x="-423.1552631578946" y="369.93947368421067" />
+      <point x="-513.3694736842104" y="369.93947368421067" />
+      <point x="0.0" y="68.0" />
+    </edge>
+    <edge source="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.supervisors" target="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.business" relationship="REFERENCES">
+      <point x="37.5" y="-44.0" />
+      <point x="123.5" y="108.0" />
+      <point x="226.0" y="108.0" />
+      <point x="0.0" y="80.0" />
+    </edge>
+    <edge source="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.tasksregistrations" target="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.students" relationship="REFERENCES">
+      <point x="-45.5" y="-92.0" />
+      <point x="-19.38437684210504" y="628.184210526316" />
+      <point x="-259.9212442105245" y="628.184210526316" />
+      <point x="30.84191368421233" y="49.490252631579494" />
+    </edge>
+    <edge source="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.tasksregistrations" target="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.tasks" relationship="REFERENCES">
+      <point x="59.88437684210504" y="-91.88332631579033" />
+      <point x="86.0" y="799.555389473684" />
+      <point x="101.06345052631559" y="799.555389473684" />
+      <point x="15.063450526315592" y="88.69924210526244" />
+    </edge>
+    <edge source="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.tasksskills" target="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.tasks" relationship="REFERENCES">
+      <point x="30.25" y="-43.5" />
+      <point x="-240.01315789473682" y="753.8621052631581" />
+      <point x="86.0" y="753.8621052631581" />
+      <point x="0.0" y="92.0" />
+    </edge>
+    <edge source="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.supervisors" target="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.users" relationship="REFERENCES">
+      <point x="-37.5" y="-44.0" />
+      <point x="48.5" y="148.0" />
+      <point x="-81.88105263157894" y="148.0" />
+      <point x="-46.5" y="80.0" />
+    </edge>
+    <edge source="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.invitekeys" target="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.business" relationship="REFERENCES">
+      <point x="55.81810526315877" y="-50.722315789473726" />
+      <point x="368.5044210526325" y="108.0" />
+      <point x="226.0" y="108.0" />
+      <point x="0.0" y="80.0" />
+    </edge>
+    <edge source="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.studentsskills" target="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.students" relationship="REFERENCES">
+      <point x="47.75" y="-56.0" />
+      <point x="-327.6552631578946" y="369.93947368421067" />
+      <point x="-339.372865263156" y="369.93947368421067" />
+      <point x="-48.60970736841915" y="54.922842105263726" />
+    </edge>
+    <edge source="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.teachers" target="b87c2c60-8e2e-4916-a9bd-d343ec6259f5.TABLE:postgres.public.users" relationship="REFERENCES">
+      <point x="0.0" y="-31.5" />
+      <point x="-90.6568421052632" y="148.0" />
+      <point x="-81.88105263157894" y="148.0" />
+      <point x="-46.5" y="80.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Compact" zoom="0.7539682539682548" showDependencies="false" x="-89.69842736841736" y="403.7999999999993" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Columns</Category>
+    <Category>Comments</Category>
+    <Category>Key columns</Category>
+    <Category>Virtual foreign keys</Category>
+  </Categories>
+</Diagram>
+

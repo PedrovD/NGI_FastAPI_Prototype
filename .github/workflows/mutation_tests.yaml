@@ -1,0 +1,28 @@
+name: Run Mutation Tests
+
+on:
+  workflow_dispatch:
+
+jobs:
+  backend-mutation-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Run Mutation Testing
+        working-directory: ./backend
+        run: mvn package -Ppitest org.pitest:pitest-maven:mutationCoverage -DoutputFormats=HTML,XML -DoutputDirectory=./backend/target/pit-reports
+      - name: Publish Mutation Test Overview
+        uses: actions/upload-artifact@v4
+        with:
+          name: pitest-report
+          path: ./backend/target/pit-reports
+      - name: Publish Extended Mutation Test Report
+        uses: Bonajo/pitest-report-action@v0.8
+        with:
+          file: ./backend/target/pit-reports/mutations.xml

@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+      - ./uploads:/app/uploads
+    environment:
+      - SQLALCHEMY_DATABASE_URI=sqlite:///./ngi.db
+      - SECRET_KEY=${SECRET_KEY:-supersecretkey}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:5173}
+      - GITHUB_CLIENT_ID=$${Ov23li5itKjjah4N6D3v}
+      - GITHUB_CLIENT_SECRET=$${1db5f063d4073e8d64e80b296443b2b95a003532}
+      - GOOGLE_CLIENT_ID=$${603398769602-45nmb9eiug7jvloi3tl23gtv0pqgdeo7.apps.googleusercontent.com}
+      - GOOGLE_CLIENT_SECRET=$${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}
+    restart: unless-stopped
+    networks:
+      - ngi-network
+
+  # Uncomment to use PostgreSQL instead of SQLite
+  # db:
+  #   image: postgres:15-alpine
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data/
+  #   environment:
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=postgres
+  #     - POSTGRES_DB=ngi
+  #   ports:
+  #     - "5432:5432"
+  #   networks:
+  #     - ngi-network
+
+networks:
+  ngi-network:
+    driver: bridge
+
+# Uncomment to use PostgreSQL instead of SQLite
+# volumes:
+#   postgres_data:

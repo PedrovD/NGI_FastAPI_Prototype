@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
+    container_name: database
+    # Start scripts
+    volumes:
+      - ./backend/src/main/resources/database/schema.sql:/docker-entrypoint-initdb.d/1init.sql
+      - ./backend/src/main/resources/database/testdata_echt.sql:/docker-entrypoint-initdb.d/2testdata.sql
+      - ./backend/src/main/resources/database/testdata_filler.sql:/docker-entrypoint-initdb.d/3testdata_fill.sql
+      
+  mailhog:
+    image: mailhog/mailhog
+    container_name: "mailhog"
+    ports:
+      - 1025:1025
+      - 8025:8025
+  
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 5173:80
+    container_name: frontend
+    depends_on:
+      - backend
+  
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports: 
+      - 8080:8080
+    container_name: backend
+    depends_on:
+      - db
+    volumes:
+      - ./backend/src/main/resources:/app/resources
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
