@@ -5,6 +5,7 @@ import Filter from "../components/Filter";
 import Loading from '../components/Loading';
 import { getProjects } from '../services';
 import PageHeader from '../components/PageHeader';
+import { AuthProvider } from '../components/AuthProvider';
 
 export default function OverviewPage() {
   const [initialBusinesses, setInitialBusinesses] = useState([]);
@@ -105,7 +106,6 @@ export default function OverviewPage() {
 
     setShownBusinesses(filteredData);
   };
-
   return (
     <>
       <PageHeader name={'Home'} />

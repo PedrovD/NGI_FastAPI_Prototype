@@ -21,12 +21,6 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
     
-    # CORS settings
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
-        "http://localhost:5173",  # Frontend development server
-        "http://localhost:8080",  # Alternative frontend port
-    ]
-    
     # Database settings
     SQLALCHEMY_DATABASE_URI: Optional[str] = None
     
@@ -40,10 +34,10 @@ class Settings(BaseSettings):
         return f"sqlite:///{sqlite_db_path}"
     
     # OAuth2 settings
-    GITHUB_CLIENT_ID: Optional[str] = "Ov23li5itKjjah4N6D3v"
-    GITHUB_CLIENT_SECRET: Optional[str] = "1db5f063d4073e8d64e80b296443b2b95a003532"
-    GOOGLE_CLIENT_ID: Optional[str] = "603398769602-45nmb9eiug7jvloi3tl23gtv0pqgdeo7.apps.googleusercontent.com"
-    GOOGLE_CLIENT_SECRET: Optional[str] = "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"
+    # GITHUB_CLIENT_ID: Optional[str] = "Ov23li5itKjjah4N6D3v"
+    # GITHUB_CLIENT_SECRET: Optional[str] = "1db5f063d4073e8d64e80b296443b2b95a003532"
+    # GOOGLE_CLIENT_ID: Optional[str] = "603398769602-45nmb9eiug7jvloi3tl23gtv0pqgdeo7.apps.googleusercontent.com"
+    # GOOGLE_CLIENT_SECRET: Optional[str] = "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"
     
     # Frontend URL
     FRONTEND_URL: str = "http://localhost:5173"

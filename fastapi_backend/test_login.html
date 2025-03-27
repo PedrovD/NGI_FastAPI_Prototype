@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .user-button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            text-align: left;
+        }
+        .student { background-color: #4CAF50; color: white; }
+        .teacher { background-color: #2196F3; color: white; }
+        .supervisor { background-color: #9C27B0; color: white; }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Login API</h1>
+    
+    <div>
+        <h2>Step 1: Get Users</h2>
+        <button id="getUsers">Get Users</button>
+        <pre id="usersResult">Results will appear here...</pre>
+    </div>
+    
+    <div>
+        <h2>Step 2: Login</h2>
+        <div id="loginButtons"></div>
+        <pre id="loginResult">Results will appear here...</pre>
+    </div>
+    
+    <div>
+        <h2>Step 3: Verify</h2>
+        <button id="verify">Verify</button>
+        <pre id="verifyResult">Results will appear here...</pre>
+    </div>
+    
+    <div>
+        <h2>Step 4: Logout</h2>
+        <button id="logout">Logout</button>
+        <pre id="logoutResult">Results will appear here...</pre>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let users = [];
+
+        // Get Users
+        document.getElementById('getUsers').addEventListener('click', async () => {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/users`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                document.getElementById('usersResult').textContent = JSON.stringify(data, null, 2);
+                
+                // Store users and create login buttons
+                users = data.users || [];
+                const loginButtons = document.getElementById('loginButtons');
+                loginButtons.innerHTML = '';
+                
+                users.forEach(user => {
+                    const button = document.createElement('button');
+                    button.textContent = `Login as ${user.username} (${user.role})`;
+                    button.classList.add('user-button', user.role);
+                    button.addEventListener('click', () => login(user.user_id));
+                    loginButtons.appendChild(button);
+                });
+            } catch (error) {
+                document.getElementById('usersResult').textContent = `Error: ${error.message}`;
+                console.error('Error fetching users:', error);
+            }
+        });
+
+        // Login
+        async function login(userId) {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/login`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user_id: userId })
+                });
+                
+                const data = await response.json();
+                document.getElementById('loginResult').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('loginResult').textContent = `Error: ${error.message}`;
+                console.error('Error logging in:', error);
+            }
+        }
+
+        // Verify
+        document.getElementById('verify').addEventListener('click', async () => {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/verify`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                document.getElementById('verifyResult').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('verifyResult').textContent = `Error: ${error.message}`;
+                console.error('Error verifying:', error);
+            }
+        });
+
+        // Logout
+        document.getElementById('logout').addEventListener('click', async () => {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/logout`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                document.getElementById('logoutResult').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('logoutResult').textContent = `Error: ${error.message}`;
+                console.error('Error logging out:', error);
+            }
+        });
+    </script>
+</body>
+</html>

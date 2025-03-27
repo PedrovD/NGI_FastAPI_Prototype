@@ -1,4 +1,4 @@
-export const API_BASE_URL = "http://localhost:8080/";
+export const API_BASE_URL = "http://localhost:8000/";
 export const FILE_BASE_URL = `${API_BASE_URL}files`;
 
 export class HttpError extends Error {
@@ -30,6 +30,11 @@ function fetchWithError(url, request, returnsVoid = false) {
     return fetch(url, {
         ...request,
         credentials: "include",
+        mode: "cors",
+        headers: {
+            ...request.headers,
+            "Content-Type": request.headers?.["Content-Type"] || "application/json",
+        },
     })
         .then(response => {
             if (!response.ok) {
@@ -190,7 +195,7 @@ export function createProject(formData) {
  * @returns {Promise<{ type: "none" } | { type: "student" | "invalid" | "teacher", userId: number } | { type: "supervisor", userId: number, businessId: number }>}
  */
 export function getAuthorization() {
-    return fetchWithError(`${API_BASE_URL}verify`, {
+    return fetchWithError(`${API_BASE_URL}api/v1/verify`, {
         method: "GET",
         headers: {
             Accept: "application/json",
@@ -204,7 +209,7 @@ export function getAuthorization() {
 }
 
 export function logout() {
-    return fetchWithError(`${API_BASE_URL}logout`, {
+    return fetchWithError(`${API_BASE_URL}api/v1/logout`, {
         method: "POST",
     }, true);
 }
@@ -401,13 +406,13 @@ export function updateStudentSkills(skillIds) {
     }, true);
 }
 
-export function login(username) {
-    return fetchWithError(`${API_BASE_URL}login`, {
+export function login(userId) {
+    return fetchWithError(`${API_BASE_URL}api/v1/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(username),
+        body: JSON.stringify({ user_id: userId }),
     }, true);
 }
 

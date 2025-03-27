@@ -17,7 +17,8 @@ from app.api.api_v1.endpoints import (
 api_router = APIRouter()
 
 # Include all endpoint routers
-api_router.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+# Include auth endpoints directly at the root level for login/logout/verify
+api_router.include_router(auth.router, tags=["Authentication"])
 api_router.include_router(users.router, prefix="/users", tags=["Users"])
 api_router.include_router(students.router, prefix="/students", tags=["Students"])
 api_router.include_router(teachers.router, prefix="/teachers", tags=["Teachers"])

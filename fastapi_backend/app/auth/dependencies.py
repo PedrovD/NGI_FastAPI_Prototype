@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Cookie
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.auth.oauth2 import get_token_data, TokenData
@@ -15,7 +15,8 @@ supervisor_repository = SupervisorRepository(model=Supervisor)
 
 def get_current_user(
     db: Session = Depends(get_db),
-    token_data: Optional[TokenData] = Depends(get_token_data)
+    token_data: Optional[TokenData] = Depends(get_token_data),
+    user_id: Optional[str] = Cookie(default=None)
 ) -> Optional[User]:
     """
     Get the current authenticated user.
@@ -23,15 +24,31 @@ def get_current_user(
     Args:
         db: Database session
         token_data: Token data from OAuth2 token
+        user_id: User ID from cookie
         
     Returns:
         User object if authenticated, None otherwise
+        
+    Note: Authentication is bypassed in this version, and the user is determined
+    by a session cookie that identifies which of the three dummy users is "logged in".
     """
-    if token_data is None:
-        return None
+    # For simplicity, we'll just return the user based on the provider_id if it's provided
+    if token_data is not None and token_data.provider_id is not None:
+        user = user_repository.get_by_provider_id(db, token_data.provider_id)
+        if user:
+            return user
     
-    user = user_repository.get_by_provider_id(db, token_data.provider_id)
-    return user
+    # Otherwise, check for a user_id cookie
+    if user_id:
+        try:
+            user_id_int = int(user_id)
+            user = user_repository.get(db, user_id_int)
+            if user:
+                return user
+        except (ValueError, TypeError):
+            pass
+    
+    return None
 
 def get_verification(
     db: Session = Depends(get_db),
@@ -98,11 +115,16 @@ def require_authentication(
         
     Raises:
         HTTPException: If not authenticated
+        
+    Note: In this version, authentication is assumed to be handled by the frontend
+    selecting one of the three dummy users.
     """
+    # In this simplified version, we'll still check if a user is set
+    # but the actual authentication is handled by the frontend
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
+            detail="Not authenticated. Please select a user from the login page.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user

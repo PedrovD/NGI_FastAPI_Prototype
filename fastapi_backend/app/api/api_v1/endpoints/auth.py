@@ -1,6 +1,7 @@
-from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, status, FastAPI
+from typing import Any, Dict, Optional
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Cookie
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.auth import (
@@ -10,47 +11,62 @@ from app.auth import (
     Token,
     TokenData
 )
-from app.schemas.user import Verification
-from app.services import user_service
+from app.schemas.user import Verification, VerificationType
+from app.services import user_service, student_service, teacher_service, supervisor_service
+from app.models.user import User
 
 router = APIRouter()
 
-app = FastAPI()
 
-# Force OpenAPI schema generation
-@router.get("/custom-openapi")
-def get_custom_openapi():
-    return get_openapi(
-        title="Your API",
-        version="1.0.0",
-        routes=app.routes,
-    )
+class LoginRequest(BaseModel):
+    user_id: int
 
-@router.post("/token", response_model=Token)
-async def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(),
+@router.post("/login", response_model=Dict[str, Any])
+async def login(
+    request: LoginRequest,
+    response: Response,
     db: Session = Depends(get_db)
 ) -> Any:
     """
-    OAuth2 compatible token login, get an access token for future requests.
+    Login as a specific user.
     
-    This endpoint is for testing purposes only, as the actual authentication
-    is handled by OAuth2 providers (Google, GitHub).
+    This endpoint is for the simplified authentication system where
+    users are pre-defined and selected from the login page.
     """
-    # In a real OAuth2 flow, we would validate the user credentials
-    # For testing, we'll just create a token with the provided username
-    user = user_service.get_by_provider_id(db, form_data.username)
+    user_id = request.user_id
+    
+    # Get the user by ID
+    user = user_service.get(db, user_id)
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
         )
     
-    access_token = create_access_token(
-        data={"sub": user.provider_id, "provider": "TEST"}
+    # Set a cookie with the user ID
+    response.set_cookie(
+        key="user_id",
+        value=str(user_id),
+        httponly=True,
+        max_age=3600 * 24 * 7,  # 7 days
+        samesite="lax"
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    
+    # Create a token for compatibility with existing code
+    access_token = create_access_token(
+        data={"sub": user.provider_id, "provider": "DIRECT"}
+    )
+    
+    # Get user type
+    verification = get_verification(db, user)
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user_id": user_id,
+        "user_type": verification.type,
+        "message": f"Logged in as {user.username}"
+    }
 
 @router.get("/verify", response_model=Verification)
 async def verify_token(
@@ -62,11 +78,54 @@ async def verify_token(
     return verification
 
 @router.post("/logout")
-async def logout() -> Any:
+async def logout(response: Response) -> Any:
     """
     Logout the current user.
     
-    In a stateless API, this is a no-op as the client should simply
-    discard the token.
+    Clears the user_id cookie.
     """
+    response.delete_cookie(key="user_id")
     return {"message": "Logged out successfully"}
+
+@router.get("/users", response_model=Dict[str, Any])
+async def get_available_users(
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Get a list of available users for the login page.
+    
+    Returns users with their roles for the simplified login system.
+    """
+    # Get all users with their roles
+    users = []
+    all_users = user_service.get_multi(db)
+    
+    for user in all_users:
+        user_data = {
+            "user_id": user.user_id,
+            "username": user.username,
+            "image_path": user.image_path,
+            "role": "unknown"
+        }
+        
+        # Check role
+        student = student_service.get_by_user_id(db, user.user_id)
+        if student:
+            user_data["role"] = "student"
+            users.append(user_data)
+            continue
+            
+        teacher = teacher_service.get_by_user_id(db, user.user_id)
+        if teacher:
+            user_data["role"] = "teacher"
+            users.append(user_data)
+            continue
+            
+        supervisor = supervisor_service.get_by_user_id(db, user.user_id)
+        if supervisor:
+            user_data["role"] = "supervisor"
+            user_data["business_id"] = supervisor.business_id
+            users.append(user_data)
+            continue
+    
+    return {"users": users}

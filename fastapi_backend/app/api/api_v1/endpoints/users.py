@@ -13,6 +13,16 @@ from app.models.user import User as UserModel
 
 router = APIRouter()
 
+
+@router.get("", response_model=List[User])
+async def read_users(
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Get all users.
+    """
+    return user_service.get_all(db)
+
 @router.get("/me", response_model=User)
 async def read_current_user(
     current_user: UserModel = Depends(require_authentication),

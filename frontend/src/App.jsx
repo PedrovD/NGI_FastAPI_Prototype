@@ -28,10 +28,10 @@ export default function App() {
       .then(data => {
         if (ignore) return;
 
-        if (data.type === "none" && location.pathname !== "/") {
-          navigate("/");
-          return
-        }
+        // if (data.type === "none" && location.pathname !== "/") {
+        //   navigate("/");
+        //   return
+        // }
 
         if (data.type === "invalid" && location.pathname !== "/email-not-found") {
           navigate("/email-not-found");

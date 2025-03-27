@@ -1,9 +1,64 @@
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { notification } from "../components/notifications/NotifySystem";
-import { API_BASE_URL } from "../services";
+import { API_BASE_URL, login } from "../services";
 
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch available users
+    fetch(`${API_BASE_URL}api/v1/users`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      }
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Failed to fetch users: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Users data:", data);
+        setUsers(data.users || []);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error("Error fetching users:", error);
+        notification.error("Failed to load users. Please try again later.");
+        setLoading(false);
+        
+        // Fallback: Create dummy users if API fails
+        setUsers([
+          { user_id: 1, username: "Student User", role: "student", image_path: "/default_profile_picture.png" },
+          { user_id: 2, username: "Teacher User", role: "teacher", image_path: "/default_profile_picture.png" },
+          { user_id: 3, username: "Supervisor User", role: "supervisor", image_path: "/default_profile_picture.png", business_id: 1 }
+        ]);
+      });
+  }, []);
+
+  const handleLogin = async (userId) => {
+    try {
+      // Use the login function from services.js
+      await login(userId);
+      
+      // Redirect to home page after successful login
+      navigate("/home");
+    } catch (error) {
+      console.error("Login error:", error);
+      notification.error("Failed to login. Please try again.");
+      
+      // For testing, we'll still redirect to home page
+      navigate("/");
+    }
+  };
 
   const error = searchParams.get("error");
   if (error !== null) {
@@ -17,34 +72,66 @@ export default function LoginPage() {
           CMD Opdrachtenbox
         </h1>
         <h2 className="mb-4 text-center text-lg font-semibold">
-          Login met je bestaande account
+          Kies een gebruiker om in te loggen
         </h2>
-        <div className="flex flex-col gap-3">
-          <a href={`${API_BASE_URL}oauth2/authorization/google`} className="btn bg-white hover:bg-gray-100 focus:ring-gray-300 border border-gray-300 text-black flex justify-center items-center gap-3">
-            <GoogleIcon className="w-5 aspect-square" />
-            <span className="text-lg font-semibold">Google</span>
-          </a>
-          <a href={`${API_BASE_URL}oauth2/authorization/github`} className="btn bg-white hover:bg-gray-100 focus:ring-gray-300 border border-gray-300 text-black flex justify-center items-center gap-3">
-            <GitHubIcon className="w-5 aspect-square" />
-            <span className="text-lg font-semibold">GitHub</span>
-          </a>
-        </div>
+        
+        {loading ? (
+          <div className="text-center py-4">Loading users...</div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {users.filter(user => user.role === "student").map(user => (
+              <button
+                key={user.user_id}
+                onClick={() => handleLogin(user.user_id)}
+                className="btn bg-blue-500 hover:bg-blue-600 text-white flex justify-center items-center gap-3"
+              >
+                <StudentIcon className="w-5 aspect-square" />
+                <span className="text-lg font-semibold">Login als Student</span>
+              </button>
+            ))}
+            
+            {users.filter(user => user.role === "teacher").map(user => (
+              <button
+                key={user.user_id}
+                onClick={() => handleLogin(user.user_id)}
+                className="btn bg-green-500 hover:bg-green-600 text-white flex justify-center items-center gap-3"
+              >
+                <TeacherIcon className="w-5 aspect-square" />
+                <span className="text-lg font-semibold">Login als Docent</span>
+              </button>
+            ))}
+            
+            {users.filter(user => user.role === "supervisor").map(user => (
+              <button
+                key={user.user_id}
+                onClick={() => handleLogin(user.user_id)}
+                className="btn bg-purple-500 hover:bg-purple-600 text-white flex justify-center items-center gap-3"
+              >
+                <SupervisorIcon className="w-5 aspect-square" />
+                <span className="text-lg font-semibold">Login als Begeleider</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
-    </div >
+    </div>
   );
 }
 
-const GoogleIcon = ({ className }) => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" className={className}>
-    <path d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z" fill="#EA4335"></path>
-    <path d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z" fill="#4285F4"></path>
-    <path d="M5.26498 14.2949C5.02498 13.5699 4.88501 12.7999 4.88501 11.9999C4.88501 11.1999 5.01998 10.4299 5.26498 9.7049L1.275 6.60986C0.46 8.22986 0 10.0599 0 11.9999C0 13.9399 0.46 15.7699 1.28 17.3899L5.26498 14.2949Z" fill="#FBBC05"></path>
-    <path d="M12.0004 24.0001C15.2404 24.0001 17.9654 22.935 19.9454 21.095L16.0804 18.095C15.0054 18.82 13.6204 19.245 12.0004 19.245C8.8704 19.245 6.21537 17.135 5.2654 14.29L1.27539 17.385C3.25539 21.31 7.3104 24.0001 12.0004 24.0001Z" fill="#34A853"></path>
+const StudentIcon = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M12 3L1 9L5 11.18V17.18L12 21L19 17.18V11.18L21 10.09V17H23V9L12 3ZM18.82 9L12 12.72L5.18 9L12 5.28L18.82 9ZM17 15.99L12 18.72L7 15.99V12.27L12 15L17 12.27V15.99Z" />
   </svg>
 )
 
-const GitHubIcon = ({ className }) => (
-  <svg fill="currentColor" viewBox="0 0 20 20" aria-hidden="true" className={className}>
-    <path d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clipRule="evenodd" fillRule="evenodd"></path>
+const TeacherIcon = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M20 17H22V15H20V17ZM20 7V13H22V7H20ZM12 9V15H14V9H12ZM12 17H14V19H12V17ZM16 13H18V7H16V13ZM16 17H18V15H16V17ZM8 13H10V7H8V13ZM8 17H10V15H8V17ZM4 13H6V7H4V13ZM4 17H6V15H4V17Z" />
+  </svg>
+)
+
+const SupervisorIcon = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM7.07 18.28C7.5 17.38 10.12 16.5 12 16.5C13.88 16.5 16.51 17.38 16.93 18.28C15.57 19.36 13.86 20 12 20C10.14 20 8.43 19.36 7.07 18.28ZM18.36 16.83C16.93 15.09 13.46 14.5 12 14.5C10.54 14.5 7.07 15.09 5.64 16.83C4.62 15.49 4 13.82 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 13.82 19.38 15.49 18.36 16.83ZM12 6C10.06 6 8.5 7.56 8.5 9.5C8.5 11.44 10.06 13 12 13C13.94 13 15.5 11.44 15.5 9.5C15.5 7.56 13.94 6 12 6ZM12 11C11.17 11 10.5 10.33 10.5 9.5C10.5 8.67 11.17 8 12 8C12.83 8 13.5 8.67 13.5 9.5C13.5 10.33 12.83 11 12 11Z" />
   </svg>
 )
